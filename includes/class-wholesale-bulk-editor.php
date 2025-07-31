@@ -67,6 +67,7 @@ class Wholesale_Bulk_Editor_Admin {
                 <thead>
                     <tr>
                         <th>Product/Variation</th>
+                        <th>Status</th>
                         <th>SKU</th>
                         <th>Regular Price</th>
                         <th>Enable all</th>
@@ -113,6 +114,10 @@ class Wholesale_Bulk_Editor_Admin {
                         if ($product->is_type('simple')) {
                             $this->output_editor_row($product, $roles, $meta_key);
                         } elseif ($product->is_type('variable')) {
+                            // Get product post status
+                            $product_post = get_post($product->get_id());
+                            $status = $product_post ? $product_post->post_status : '';
+                            list($status_label, $status_class) = $this->get_status_badge($status, false);
                             ?>
                             <tr class="wbe-row-parent" style="background:#efefef;font-weight:bold;">
                                 <td>
@@ -121,6 +126,7 @@ class Wholesale_Bulk_Editor_Admin {
                                     </a>
                                     <span style="color:#999; margin-left:10px;">(Parent Variable Product)</span>
                                 </td>
+                                <td><span class="wbe-status-badge <?php echo esc_attr($status_class); ?>"><?php echo esc_html($status_label); ?></span></td>
                                 <td><?php echo esc_html($product->get_sku()); ?></td>
                                 <td><?php echo wc_price($product->get_regular_price()); ?></td>
                                 <td></td>
@@ -141,7 +147,7 @@ class Wholesale_Bulk_Editor_Admin {
                     endwhile;
                     wp_reset_postdata();
                 else:
-                    echo '<tr><td colspan="'.(5+count($roles)).'">No products found.</td></tr>';
+                    echo '<tr><td colspan="'.(6+count($roles)).'">No products found.</td></tr>';
                 endif;
                 ?>
                 </tbody>
@@ -182,6 +188,12 @@ class Wholesale_Bulk_Editor_Admin {
         $is_variation = $product->is_type('variation');
         $meta = get_post_meta($product_id, $meta_key, true);
         if (!is_array($meta)) $meta = [];
+
+        // Get status for product or variation
+        $product_post = get_post($product_id);
+        $status = $product_post ? $product_post->post_status : '';
+        list($status_label, $status_class) = $this->get_status_badge($status, $is_variation);
+
         if ($is_variation && $parent) {
             $display_name = esc_html($product->get_name());
         } else {
@@ -191,6 +203,7 @@ class Wholesale_Bulk_Editor_Admin {
         ?>
         <tr class="<?php echo $is_variation ? 'wbe-row-variation' : 'wbe-row-parent'; ?>">
             <td><?php echo $display_name; ?></td>
+            <td><span class="wbe-status-badge <?php echo esc_attr($status_class); ?>"><?php echo esc_html($status_label); ?></span></td>
             <td><?php echo esc_html($product->get_sku()); ?></td>
             <td><?php echo wc_price($product->get_regular_price()); ?></td>
             <!-- Enable all checkbox -->
@@ -242,6 +255,29 @@ class Wholesale_Bulk_Editor_Admin {
             </td>
         </tr>
         <?php
+    }
+
+    private function get_status_badge($status, $is_variation = false) {
+        if ($is_variation) {
+            // Variations: Enabled (publish), Disabled (others)
+            if ($status === 'publish') {
+                return ['E', 'wbe-badge-enabled'];
+            } else {
+                return ['D', 'wbe-badge-disabled'];
+            }
+        } else {
+            // Products: Published, Draft, Private, Other
+            switch ($status) {
+                case 'publish':
+                    return ['P', 'wbe-badge-published'];
+                case 'draft':
+                    return ['Dr', 'wbe-badge-draft'];
+                case 'private':
+                    return ['Pr', 'wbe-badge-private'];
+                default:
+                    return [ucfirst($status), 'wbe-badge-other'];
+            }
+        }
     }
 }
 

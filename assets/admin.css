@@ -50,3 +50,18 @@
         top: 55px;
     }
 }
+.wbe-status-badge {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: #fff;
+    margin-left: 2px;
+}
+.wbe-badge-published { background: #46b450; }
+.wbe-badge-draft { background: #82878c; }
+.wbe-badge-private { background: #a0a5aa; }
+.wbe-badge-other { background: #9ca3af; }
+.wbe-badge-enabled { background: #2271b1; }
+.wbe-badge-disabled { background: #c72c2c; }
