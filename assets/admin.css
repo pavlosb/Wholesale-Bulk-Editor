@@ -65,3 +65,15 @@
 .wbe-badge-other { background: #9ca3af; }
 .wbe-badge-enabled { background: #2271b1; }
 .wbe-badge-disabled { background: #c72c2c; }
+.wp-list-table.striped > tbody > tr:nth-child(odd) {
+    background-color: #f9fafb; /* Light gray */
+}
+.wp-list-table.striped > tbody > tr:nth-child(even) {
+    background-color: #fff;
+}
+.wp-list-table > tbody > tr.wbe-row-parent {
+    background: #f3f4f6 !important; /* Slightly stronger for parent rows */
+}
+.wp-list-table > tbody > tr.wbe-row-variation {
+    /* You can optionally adjust this if needed */
+}
